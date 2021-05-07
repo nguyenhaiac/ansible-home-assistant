@@ -1,0 +1,45 @@
+- name: Installs zsh | apt
+  become: yes
+  become_user: root
+  package:
+    name: zsh
+    state: present
+
+- name: Installs curl | apt
+  become: yes
+  become_user: root
+  package:
+    name: curl
+    state: present
+
+- name: Sets zsh as default shell for my user | command
+  become: yes
+  become_user: root
+  command: chsh -s /bin/zsh {{ ansible_env.USER }}
+  register: zsh_for_user
+  failed_when: zsh_for_user.rc >= 1
+  changed_when: zsh_for_user.rc == 0
+
+- name: create zsh folder
+  file:
+    path: "{{ansible_env.HOME}}/.config/zsh"
+    state: directory
+
+- name: Copy zshrc
+  copy:
+    src: "./files/.zshrc"
+    dest: "{{ ansible_env.HOME }}/.config/zsh/.zshrc"
+    owner: "{{ansible_env.USER}}"
+    group: "{{ansible_env.USER}}"
+
+- name: Copy env
+  copy:
+    src: "./files/.zshenv"
+    dest: "{{ ansible_env.HOME }}/.zshenv"
+    owner: "{{ansible_env.USER}}"
+    group: "{{ansible_env.USER}}"
+
+- name: Copy shellconfig
+  copy:
+    src: "./files/shellconfig/"
+    dest: "{{ ansible_env.HOME }}/.config/zsh/shellconfig"

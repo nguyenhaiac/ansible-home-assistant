@@ -1,0 +1,11 @@
+---
+- name: Set up local workstation
+  hosts: remote
+  user: hainguyen
+  roles:
+    - role: docker
+      tags:
+        - docker
+    - role: home-assistant
+      tags:
+        - home-assistant

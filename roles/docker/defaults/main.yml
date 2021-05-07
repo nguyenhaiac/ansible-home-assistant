@@ -1,0 +1,15 @@
+package_upgrade: yes
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - network-manager
+  - apparmor-utils
+  - jq
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io

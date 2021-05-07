@@ -1,0 +1,16 @@
+- name: Install starship
+  become: yes
+  become_user: root
+  package:
+    name: starship
+    state: present
+
+- name: Create folder
+  file:
+    path: "{{ansible_env.HOME}}/.config/starship"
+    state: directory
+
+- name: Copy config
+  copy:
+    src: "./roles/starship/files/starship.toml"
+    dest: "{{ansible_env.HOME}}/.config/starship/starship.toml"

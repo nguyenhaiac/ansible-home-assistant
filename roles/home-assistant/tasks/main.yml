@@ -1,0 +1,12 @@
+- name: Download installer Home assistant
+  get_url:
+    url: https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh
+    dest: "{{ ansible_env.HOME }}/installer.sh"
+
+- name: install home assistant
+  expect:
+    command: bash "{{ ansible_env.HOME }}/installer.sh" --machine intel-nuc
+    responses:
+      \[N/y\]: y
+  become: yes
+  become_user: root

@@ -1,0 +1,74 @@
+- name: Upgrade apt
+  apt: upgrade=yes
+  when: package_upgrade
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Install apt packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+  loop: "{{ packages }}"
+
+
+- name: remove gpg key docker
+  file:
+    path: "{{ ansible_env.HOME }}/docker-archive-keyring.gpg"
+    state: absent
+
+- name: add docker GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o "{{ansible_env.HOME}}/docker-archive-keyring.gpg"
+
+- name: copy docker GPG key
+  copy:
+    src: "{{ ansible_env.HOME }}/docker-archive-keyring.gpg"
+    dest: "/usr/share/keyrings/docker-archive-keyring.gpg"
+    remote_src: yes
+  become: yes
+  become_user: root
+
+- name: add official repo
+  shell: echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee "{{ ansible_env.HOME }}/docker.list"
+
+- name: copy docker official repo
+  copy:
+    src: "{{ ansible_env.HOME }}/docker.list"
+    dest: "/etc/apt/sources.list.d/docker.list"
+    remote_src: yes
+  become: yes
+  become_user: root
+
+
+- name: Upgrade apt
+  apt: upgrade=yes
+  when: package_upgrade
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Install docker packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+  loop: "{{ docker_packages }}"
+
+- name: Start docker
+  become: yes
+  become_user: root
+  systemd:
+    name: docker
+    state: started
+
+- name: add user to docker group
+  user:
+    name: "{{ ansible_env.USER }}"
+    group: docker
+  become: yes
+  become_user: root

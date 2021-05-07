@@ -1,0 +1,16 @@
+lc() {
+     tmp="$(mktemp)"
+     lf -last-dir-path="$tmp" "$@"
+     if [ -f "$tmp" ]; then
+        dir="$(cat "$tmp")"
+        rm -f "$tmp"
+        [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
+     fi
+}
+
+function cpr() {
+  rsync --archive -hh --partial --info=stats1 --info=progress2 --modify-window=1 "$@"
+}
+function mvr() {
+  rsync --archive -hh --partial --info=stats1 --info=progress2 --modify-window=1 --remove-source-files "$@"
+}
